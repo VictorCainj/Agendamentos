@@ -17,6 +17,8 @@ import {
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Appointment } from '../../types';
+import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 interface AppointmentFormProps {
   open: boolean;
@@ -53,6 +55,8 @@ export function AppointmentForm({
     approvedValue: initialData?.approvedValue
   });
 
+  const theme = useTheme();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
@@ -70,9 +74,20 @@ export function AppointmentForm({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth
+      fullScreen={useMediaQuery(theme.breakpoints.down('sm'))}
+    >
       <form onSubmit={handleSubmit}>
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          px: { xs: 2, sm: 3 }
+        }}>
           {initialData ? 'Editar Agendamento' : 'Novo Agendamento'}
           {initialData && onDelete && (
             <IconButton 
@@ -90,17 +105,26 @@ export function AppointmentForm({
           )}
         </DialogTitle>
         
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 2, 
+            mt: 2,
+            '& .MuiFormControl-root': {
+              width: '100%'
+            }
+          }}>
             <FormControl fullWidth>
               <InputLabel>Tipo de Serviço</InputLabel>
               <Select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as 'orçamento' | 'reparo' })}
                 required
+                native
               >
-                <MenuItem value="orçamento">Orçamento</MenuItem>
-                <MenuItem value="reparo">Reparo</MenuItem>
+                <option value="orçamento">Orçamento</option>
+                <option value="reparo">Reparo</option>
               </Select>
             </FormControl>
 
@@ -108,6 +132,11 @@ export function AppointmentForm({
               label="Data e Hora"
               value={formData.date}
               onChange={(newValue) => setFormData({ ...formData, date: newValue || new Date() })}
+              slotProps={{
+                textField: {
+                  fullWidth: true
+                }
+              }}
             />
 
             <TextField
@@ -116,6 +145,9 @@ export function AppointmentForm({
               onChange={(e) => setFormData({ ...formData, tenant: e.target.value })}
               required
               fullWidth
+              inputProps={{
+                autoComplete: 'off'
+              }}
             />
 
             <TextField
@@ -124,6 +156,9 @@ export function AppointmentForm({
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               required
               fullWidth
+              inputProps={{
+                autoComplete: 'off'
+              }}
             />
 
             <TextField
@@ -143,16 +178,17 @@ export function AppointmentForm({
                 <Select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as Appointment['status'] })}
+                  native
                 >
-                  <MenuItem value="pending">Pendente</MenuItem>
-                  <MenuItem value="confirmed">Confirmado</MenuItem>
-                  <MenuItem value="cancelled">Cancelado</MenuItem>
-                  <MenuItem value="completed">Concluído</MenuItem>
+                  <option value="pending">Pendente</option>
+                  <option value="confirmed">Confirmado</option>
+                  <option value="cancelled">Cancelado</option>
+                  <option value="completed">Concluído</option>
                 </Select>
               </FormControl>
             )}
 
-            {initialData?.type === 'orçamento' && initialData.status === 'confirmed' && (
+            {formData.status === 'confirmed' && (
               <>
                 <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: 'bold' }}>
                   Informações do Orçamento Aprovado
@@ -172,9 +208,14 @@ export function AppointmentForm({
           </Box>
         </DialogContent>
 
-        <DialogActions>
+        <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
           <Button onClick={onClose}>Cancelar</Button>
-          <Button type="submit" variant="contained" color="primary">
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="primary"
+            fullWidth={useMediaQuery(theme.breakpoints.down('sm'))}
+          >
             {initialData ? 'Salvar' : 'Agendar'}
           </Button>
         </DialogActions>
